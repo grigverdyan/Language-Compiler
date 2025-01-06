@@ -20,7 +20,6 @@ Variable_Declaration    = _let_ Identifier ':' Type [ '=' Expression ] ';'
 Assignment              = Identifier '=' Expression ';'
 Conditional_Statement   = _if_ '(' Expression ')' Body { _elif_ '(' Expression ')' Body } [ _else_ Body }
 Loop_While_Statement    = _while_ '(' Expression ')' Body
-Loop_Foreach_Statement  = _foreach_ '(' Variable_Declaration | Assignment ';' Expression ';' Assignment ')' Body
 Return_Statement        = _return_ Identifier | Expression ';'
 
 Expression              = Simple_Expression [ Comparison_Operator Simple_Expression ]
@@ -30,10 +29,10 @@ Term                    = Identifier | Number | Function_Call | '(' Expression '
 Function_Call           = Identifier '(' [ Argument_List ] ')'
 Argument_List           = Expression { ',' Expression } 
 
-Type                   = _int_ | _float_ | _boolean_ | _string_ | _void_
+Type                   = _int_ | _string_ | _bool_ | _void_
 Identifier             = Letter { Letter | Digit }
 Number                 = Digit { Digit }
-Arithmetic_Operator    = '+' | '-' | '*' | '%' | '/'
+Arithmetic_Operator    = '+' | '-' | '*'
 Comparison_Operator    = '==' | '<' | '>' | '<=' | '>=' | '!='
 Logical_operator       = '&&' | '||' | '!'
 
@@ -60,7 +59,7 @@ def main(): void
 
     if (result > 10)
     {
-        result = result * 2;
+        result = result + 10;
     }
 
     while (result > 0)
