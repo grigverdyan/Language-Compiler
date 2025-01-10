@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/LanguageCompiler.dir/src/main.cpp.o CMakeFiles/LanguageCompiler.dir/parser.cpp.o CMakeFiles/LanguageCompiler.dir/lexer.cpp.o -o LanguageCompiler 

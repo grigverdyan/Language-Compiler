@@ -1,0 +1,3 @@
+/mnt/c/Users/Grigori/Desktop/Projects/Language-Compiler/language_compiler/build/CMakeFiles/LanguageCompiler.dir
+/mnt/c/Users/Grigori/Desktop/Projects/Language-Compiler/language_compiler/build/CMakeFiles/edit_cache.dir
+/mnt/c/Users/Grigori/Desktop/Projects/Language-Compiler/language_compiler/build/CMakeFiles/rebuild_cache.dir

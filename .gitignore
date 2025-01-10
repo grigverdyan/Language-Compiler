@@ -41,4 +41,4 @@ coverage/
 *.temp
 
 # My personal files
-/build
+build
