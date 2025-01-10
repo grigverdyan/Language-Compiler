@@ -1,0 +1,44 @@
+# Compiled source files
+*.class
+
+# Log files
+*.log
+
+# Package files
+*.jar
+*.war
+*.ear
+
+# IDE specific files
+/.idea/
+/*.iml
+*.swp
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Node.js dependencies
+/node_modules
+
+# Python compiled files
+*.pyc
+__pycache__/
+
+# JavaScript compiled files
+/dist/
+/build/
+
+# Environment variables
+.env
+
+# Coverage reports
+coverage/
+*.lcov
+
+# Temporary files
+*.tmp
+*.temp
+
+# My personal files
+/build
