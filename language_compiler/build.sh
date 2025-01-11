@@ -1,53 +1,28 @@
 #!/bin/bash
 
-BUILD_DIR="build"
-
-# Function to clean the build 
-clean() {
-    echo "Cleaning build directory..."
-    rm -rf $BUILD_DIR
-    echo "Build directory cleaned."
-}
-
-# Function to build the project
-build() {
-    echo "Building the project..."
-    mkdir -p $BUILD_DIR
-    cd $BUILD_DIR
-    cmake ..
-    echo "Build completed."
-}
-
-# Function to rebuild the project
-rebuild() {
-    clean
-    build
-}
-
-# Function to make
-mymake() {
-    pwd
-    cd $BUILD_DIR
-    make
-    cd ..
-    echo "Target made."
-}
+BUILD_DIR=build
 
 case "$1" in
-    clean)
-        clean
-        ;;
-    build)
-        build
-        ;;
-    rebuild)
-        rebuild
-        ;;
-    mymake)
+    "build")
+        mkdir -p "$BUILD_DIR"
+        cd "$BUILD_DIR"
+        cmake ..
         make
+        cd ..
+        ;;
+    "clean")
+        rm -rf "$BUILD_DIR"
+        ;;
+    "rebuild")
+        rm -rf "$BUILD_DIR"
+        mkdir -p "$BUILD_DIR"
+        cd "$BUILD_DIR"
+        cmake ..
+        make
+        cd ..
         ;;
     *)
-        echo "Usage: $0 {clean|build|rebuild}"
+        echo "Usage: $0 {build|clean|rebuild}"
         exit 1
         ;;
 esac

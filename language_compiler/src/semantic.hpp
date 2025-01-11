@@ -2,58 +2,86 @@
 #define SEMANTIC_HPP
 
 #include "ast.hpp"
-#include <unordered_map>
+#include <map>
 #include <string>
-#include <stdexcept>
+#include <iostream>
+#include <stack>
 
-class SemanticAnalyzer {
+class SymbolTable
+{
 public:
-    void analyze(Program* program) {
-        for (auto stmt : program->statements) {
-            analyzeStatement(stmt);
+    std::map<std::string, Type> symbols;
+    SymbolTable* parent;
+    bool isFunctionScope;
+
+    SymbolTable(SymbolTable* parent = nullptr) 
+        : parent(parent)
+        , isFunctionScope(false) 
+    {};
+
+    void addSymbol(const std::string& name, Type type)
+    {
+        if (symbols.find(name) != symbols.end())
+        {
+            std::cerr << "Semantic Error: Variable '" << name << "' already declared in this scope." << std::endl;
+            exit(1);
         }
+        symbols[name] = type;
     }
+    Type getSymbolType(const std::string& name)
+    {
+        if (symbols.find(name) != symbols.end())
+            return symbols[name];
 
-private:
-    std::unordered_map<std::string, std::string> symbolTable;
+        if (parent != nullptr)
+            return parent->getSymbolType(name);
 
-    void analyzeStatement(Statement* stmt) {
-        if (auto letStmt = dynamic_cast<LetStatement*>(stmt)) {
-            if (symbolTable.find(letStmt->identifier) != symbolTable.end()) {
-                throw std::runtime_error("Variable already declared: " + letStmt->identifier);
-            }
-            symbolTable[letStmt->identifier] = letStmt->type;
-            analyzeExpression(letStmt->value);
-        } else if (auto ifStmt = dynamic_cast<IfStatement*>(stmt)) {
-            analyzeExpression(ifStmt->condition);
-            analyzeStatement(ifStmt->consequence);
-            if (ifStmt->alternative) {
-                analyzeStatement(ifStmt->alternative);
-            }
-        } else if (auto whileStmt = dynamic_cast<WhileStatement*>(stmt)) {
-            analyzeExpression(whileStmt->condition);
-            analyzeStatement(whileStmt->body);
-        } else if (auto returnStmt = dynamic_cast<ReturnStatement*>(stmt)) {
-            analyzeExpression(returnStmt->value);
-        }
-    }
-
-    void analyzeExpression(Expression* expr) {
-        if (auto binExpr = dynamic_cast<BinaryExpression*>(expr)) {
-            analyzeExpression(binExpr->left);
-            analyzeExpression(binExpr->right);
-        } else if (auto ident = dynamic_cast<Identifier*>(expr)) {
-            if (symbolTable.find(ident->name) == symbolTable.end()) {
-                throw std::runtime_error("Undeclared variable: " + ident->name);
-            }
-        } else if (auto num = dynamic_cast<Number*>(expr)) {
-            // No semantic checks for numbers
-        } else if (auto funcCall = dynamic_cast<FunctionCall*>(expr)) {
-            for (auto arg : funcCall->arguments) {
-                analyzeExpression(arg);
-            }
-        }
+        return Type::TYPE_UNDEFINED;
     }
 };
+
+
+class SemanticAnalyzer : public ASTVisitor
+{
+public:
+    SymbolTable globalSymbolTable;
+    SymbolTable* currentScope;
+
+    SemanticAnalyzer()
+        : currentScope(&globalSymbolTable)
+    {}
+    ~SemanticAnalyzer() = default;
+    
+    void enterScope();
+    void exitScope();
+
+    void visit(ProgramNode& node) override;
+    void visit(BlockNode& node) override;
+    void visit(FunctionDefNode& node) override;
+    void visit(LetStatementNode& node) override;
+    void visit(AssignStatementNode& node) override;
+    void visit(IfStatementNode& node) override;
+    void visit(WhileStatementNode& node) override;
+    void visit(ReturnStatementNode& node) override;
+    void visit(BinaryExpressionNode& node) override;
+    void visit(FunctionCallNode& node) override;
+    void visit(NumberNode& node) override;
+    void visit(IdentifierNode& node) override;
+    Type checkExpressionType(ASTNode* node);
+    void analyze(ASTNode* program);
+
+    std::map<std::string, FunctionDefNode*> functions;
+
+private:
+    void error(const std::string& message);
+    void checkType(ASTNode* node, Type expectedType, const std::string& errorMessage);
+    Type inferBinaryOperationType(BinaryOperator op, Type leftType, Type rightType);
+    Type getFunctionReturnType(const std::string& name);
+    FunctionDefNode* getFunctionDefinition(const std::string& name);
+    FunctionDefNode* currentFunction = nullptr;
+
+};
+
+extern SemanticAnalyzer semanticAnalyzer;
 
 #endif // SEMANTIC_HPP

@@ -18,17 +18,6 @@
 .DS_Store
 Thumbs.db
 
-# Node.js dependencies
-/node_modules
-
-# Python compiled files
-*.pyc
-__pycache__/
-
-# JavaScript compiled files
-/dist/
-/build/
-
 # Environment variables
 .env
 
@@ -41,4 +30,6 @@ coverage/
 *.temp
 
 # My personal files
-build
+*/build/
+.vscode/
+*.st

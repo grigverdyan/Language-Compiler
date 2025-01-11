@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(LanguageCompiler)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
@@ -15,9 +16,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_executable(LanguageCompiler
     src/main.cpp
-    src/ast.hpp
-    src/semantic.hpp
-    src/codegen.hpp
+    src/ast.cpp
+    src/semantic.cpp
+    src/codegen.cpp
     ${BISON_Parser_OUTPUTS}
     ${FLEX_Lexer_OUTPUTS}
 )

@@ -64,7 +64,7 @@ def main(): void
 
     while (result > 0)
     {
-        print(result);
+        # print(result);
         result = result - 1;
     }
 }

@@ -1,58 +1,50 @@
 %{
-#include <string>
-#include <vector>
 #include "ast.hpp"
 #include "parser.hpp"
+#include <iostream>
+#include <vector>
+#include <string>
 %}
 
 %option noyywrap
-%option debug
 
 %%
+"def"               { return DEF; }
+"let"               { return LET; }
+"if"                { return IF; }
+"elif"              { return ELIF; }
+"else"              { return ELSE; }
+"while"             { return WHILE; }
+"return"            { return RETURN; }
+"int"               { return TYPE_INT; }
+"string"            { return TYPE_STRING; }
+"bool"              { return TYPE_BOOL; }
+"void"              { return TYPE_VOID; }
 
-"let"           { return LET; }
-"if"            { return IF; }
-"elif"          { return ELIF; }
-"else"          { return ELSE; }
-"while"         { return WHILE; }
-"return"        { return RETURN; }
-"int"           { return INT_TYPE; }
-"string"        { return STRING_TYPE; }
-"bool"          { return BOOL_TYPE; }
-"void"          { return VOID_TYPE; }
+"("                 { return LPAREN; }
+")"                 { return RPAREN; }
+"{"                 { return LBRACE; }
+"}"                 { return RBRACE; }
+":"                 { return COLON; }
+";"                 { return SEMICOLON; }
+","                 { return COMMA; }
+"="                 { return EQUAL; }
+"+"                 { return PLUS; }
+"-"                 { return MINUS; }
+"*"                 { return TIMES; }
+"=="                { return EQ; }
+"!="                { return NEQ; }
+"<"                 { return LT; }
+">"                 { return GT; }
+"<="                { return LTE; }
+">="                { return GTE; }
 
-[0-9]+          { yylval.intVal = atoi(yytext); return NUMBER; }
-[a-zA-Z_][a-zA-Z0-9_]* { yylval.strVal = strdup(yytext); return IDENTIFIER; }
+[a-zA-Z_][a-zA-Z0-9_]*  { yylval.sval = strdup(yytext); return IDENTIFIER; }
+[0-9]+              { yylval.ival = atoi(yytext); return NUMBER; }
 
-"+"             { return PLUS; }
-"-"             { return MINUS; }
-"*"             { return MULTIPLY; }
-"="             { return ASSIGN; }
-"=="            { return EQ; }
-"!="            { return NEQ; }
-"<"             { return LT; }
-">"             { return GT; }
-"<="            { return LE; }
-">="            { return GE; }
-"&&"            { return AND; }
-"||"            { return OR; }
-"!"             { return NOT; }
-
-"("             { return LPAREN; }
-")"             { return RPAREN; }
-"{"             { return LBRACE; }
-"}"             { return RBRACE; }
-":"             { return COLON; }
-";"             { return SEMICOLON; }
-","             { return COMMA; }
-
-[ \t\n]+        { /* skip whitespace */ }
-"#".*           { /* skip comments */ }
-
-.               { return yytext[0]; }
+[ \t]+              ;
+\r?\n               ;
+"#"([^\n]*)         ;
+.                   { std::cerr << "Invalid character: " << yytext << std::endl; }
 
 %%
-
-int mywrap() {
-    return 1;
-}
