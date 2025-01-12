@@ -4,7 +4,7 @@ def add(a: int, b: int): int {
 }
 
 # The main function
-def main(): void {
+def main(): int {
     let x: int = 5;
     let y: int = 10;
     let result: int = add(x, y);
@@ -13,10 +13,19 @@ def main(): void {
     {
         result = result + 10;
     }
+    elif (result == 0)
+    {
+        result = 42;
+    }
+    else 
+    { 
+        result = 1;
+    }
 
     while (result > 0)
     {
-        # print(result);
+        
         result = result - 1;
     }
+    return 0;
 }

@@ -2,31 +2,6 @@
 #include <iostream>
 #include <sstream>
 
-CodeGenerator::CodeGenerator(const std::string& filename)
-{
-    outputFile.open(filename);
-    if (!outputFile.is_open())
-    {
-        std::cerr << "Error: Could not open output file: " << filename << std::endl;
-        exit(1);
-    }
-}
-
-CodeGenerator::~CodeGenerator()
-{
-    outputFile.close();
-}
-
-void CodeGenerator::generateCode(ASTNode* program)
-{
-    program->accept(*this);
-}
-
-std::string CodeGenerator::generateLabel()
-{
-    return "label" + std::to_string(labelCounter++);
-}
-
 void CodeGenerator::visit(ProgramNode& node)
 {
     for (const auto& subprogram : node.subprograms)
@@ -43,7 +18,6 @@ void CodeGenerator::visit(BlockNode& node)
     }
 }
 
-
 void CodeGenerator::visit(FunctionDefNode& node)
 {
     outputFile << node.name << ":" << std::endl;
@@ -52,10 +26,7 @@ void CodeGenerator::visit(FunctionDefNode& node)
         outputFile << "push " << param.first << std::endl;
     }
     node.body->accept(*this);
-    if(node.name != "main")
-    {
-        outputFile << "ret" << std::endl;
-    }
+    outputFile << "ret" << std::endl << std::endl;
 }
 
 void CodeGenerator::visit(LetStatementNode& node)

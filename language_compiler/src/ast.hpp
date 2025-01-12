@@ -34,18 +34,17 @@ enum class BinaryOperator
 std::ostream& operator<<(std::ostream& os, const BinaryOperator& op);
 
 // Forward declaration
-class ASTVisitor;
+struct ASTVisitor;
 
-class ASTNode
+struct ASTNode
 {
 public:
     virtual ~ASTNode() = default;
     virtual void accept(ASTVisitor& visitor) = 0;
 };
 
-class ProgramNode : public ASTNode
+struct ProgramNode : public ASTNode
 {
-public:
     std::vector<std::unique_ptr<ASTNode>> subprograms;
 
     ProgramNode(ASTNode* subprogram = nullptr)
@@ -58,9 +57,8 @@ public:
 };
 
 
-class BlockNode : public ASTNode
+struct BlockNode : public ASTNode
 {
-public:
     std::vector<std::unique_ptr<ASTNode>> statements;
 
     BlockNode(std::vector<ASTNode*> stmts)
@@ -72,9 +70,8 @@ public:
     void accept(ASTVisitor& visitor) override;
 };
 
-class FunctionDefNode : public ASTNode
+struct FunctionDefNode : public ASTNode
 {
-public:
     std::string name;
     std::vector<std::pair<std::string, Type>> parameters;
     Type returnType;
@@ -90,9 +87,8 @@ public:
     void accept(ASTVisitor& visitor) override;
 };
 
-class LetStatementNode : public ASTNode
+struct LetStatementNode : public ASTNode
 {
-public:
     std::string varName;
     Type varType;
     std::unique_ptr<ASTNode> initExpr;
@@ -106,9 +102,8 @@ public:
     void accept(ASTVisitor& visitor) override;
 };
 
-class AssignStatementNode : public ASTNode
+struct AssignStatementNode : public ASTNode
 {
-public:
     std::string varName;
     std::unique_ptr<ASTNode> expression;
 
@@ -120,9 +115,8 @@ public:
     void accept(ASTVisitor& visitor) override;
 };
 
-class IfStatementNode : public ASTNode
+struct IfStatementNode : public ASTNode
 {
-public:
     std::unique_ptr<ASTNode> condition;
     std::unique_ptr<ASTNode> body;
     std::vector<std::pair<ASTNode*, ASTNode*>> elifClauses;
@@ -148,9 +142,8 @@ public:
     void accept(ASTVisitor& visitor) override;
 };
 
-class WhileStatementNode : public ASTNode
+struct WhileStatementNode : public ASTNode
 {
-public:
     std::unique_ptr<ASTNode> condition;
     std::unique_ptr<ASTNode> body;
 
@@ -162,9 +155,8 @@ public:
     void accept(ASTVisitor& visitor) override;
 };
 
-class ReturnStatementNode : public ASTNode
+struct ReturnStatementNode : public ASTNode
 {
-public:
     std::unique_ptr<ASTNode> expression;
 
     ReturnStatementNode(ASTNode* expr) 
@@ -174,9 +166,8 @@ public:
     void accept(ASTVisitor& visitor) override;
 };
 
-class BinaryExpressionNode : public ASTNode
+struct BinaryExpressionNode : public ASTNode
 {
-public:
     std::unique_ptr<ASTNode> left;
     std::unique_ptr<ASTNode> right;
     BinaryOperator op;
@@ -190,9 +181,8 @@ public:
     void accept(ASTVisitor& visitor) override;
 };
 
-class FunctionCallNode : public ASTNode
+struct FunctionCallNode : public ASTNode
 {
-public:
     std::string name;
     std::vector<std::unique_ptr<ASTNode>> arguments;
 
@@ -206,10 +196,10 @@ public:
     void accept(ASTVisitor& visitor) override;
 };
 
-class NumberNode : public ASTNode
+struct NumberNode : public ASTNode
 {
-public:
     int value;
+
     NumberNode(int val) 
         : value(val) 
     {}
@@ -217,9 +207,8 @@ public:
     void accept(ASTVisitor& visitor) override;
 };
 
-class IdentifierNode : public ASTNode
+struct IdentifierNode : public ASTNode
 {
-public:
     std::string name;
 
     IdentifierNode(const std::string& name)
@@ -231,9 +220,8 @@ public:
 
 
 // Visitor Pattern
-class ASTVisitor
+struct ASTVisitor
 {
-public:
     virtual ~ASTVisitor() = default;
     
     virtual void visit(ProgramNode& node) = 0;

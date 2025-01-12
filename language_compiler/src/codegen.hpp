@@ -2,19 +2,34 @@
 #define CODEGEN_HPP
 
 #include "ast.hpp"
+#include "macros.hpp"
+
 #include <string>
 #include <fstream>
 #include <vector>
+#include <iostream>
 
 class CodeGenerator : public ASTVisitor
 {
-public:
     std::ofstream outputFile;
     int labelCounter = 0;
-    CodeGenerator(const std::string& filename);
-    ~CodeGenerator() override;
-    void generateCode(ASTNode* program);
-    std::string generateLabel();
+
+public:
+    CodeGenerator(const std::string& filename)
+    {
+        outputFile.open(filename);
+        if (!outputFile.is_open())
+        {
+            std::cerr << RED << "Error: Could not open output file: " << YELLOW << filename << RESET << std::endl;
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    ~CodeGenerator() { outputFile.close(); }
+
+    void generateCode(ASTNode* program) { program->accept(*this); }
+    
+    std::string generateLabel() { return "label" + std::to_string(labelCounter++); }
 
     void visit(ProgramNode& node) override;
     void visit(BlockNode& node) override;

@@ -40,13 +40,14 @@ public:
     }
 };
 
-
 class SemanticAnalyzer : public ASTVisitor
 {
-public:
     SymbolTable globalSymbolTable;
     SymbolTable* currentScope;
+    std::map<std::string, FunctionDefNode*> functions;
+    FunctionDefNode* currentFunction = nullptr;
 
+public:
     SemanticAnalyzer()
         : currentScope(&globalSymbolTable)
     {}
@@ -67,19 +68,15 @@ public:
     void visit(FunctionCallNode& node) override;
     void visit(NumberNode& node) override;
     void visit(IdentifierNode& node) override;
-    Type checkExpressionType(ASTNode* node);
     void analyze(ASTNode* program);
-
-    std::map<std::string, FunctionDefNode*> functions;
 
 private:
     void error(const std::string& message);
     void checkType(ASTNode* node, Type expectedType, const std::string& errorMessage);
     Type inferBinaryOperationType(BinaryOperator op, Type leftType, Type rightType);
     Type getFunctionReturnType(const std::string& name);
+    Type checkExpressionType(ASTNode* node);
     FunctionDefNode* getFunctionDefinition(const std::string& name);
-    FunctionDefNode* currentFunction = nullptr;
-
 };
 
 extern SemanticAnalyzer semanticAnalyzer;

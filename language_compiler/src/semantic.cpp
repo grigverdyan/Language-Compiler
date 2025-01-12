@@ -1,4 +1,5 @@
 #include "semantic.hpp"
+#include "macros.hpp"
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -9,21 +10,30 @@ SemanticAnalyzer semanticAnalyzer;
 void SemanticAnalyzer::enterScope()
 {
     currentScope = new SymbolTable(currentScope);
+
+    // For Debugging info
+#ifdef DEBUG
     std::cerr << "Entering scope, current scope: " << currentScope << std::endl;
+    // End Debugging info
+#endif
 }
 
 void SemanticAnalyzer::exitScope()
 {
+    // For Debugging info
+#ifdef DEBUG
     std::cerr << "Exiting scope, current scope: " << currentScope << std::endl;
+    // End Debugging info
+#endif    
+    
     delete currentScope;
     currentScope = currentScope->parent;
-
 }
 
 // Private member functions
 void SemanticAnalyzer::error(const std::string& message)
 {
-    std::cerr << "Semantic Error: " << message << std::endl;
+    std::cerr << RED << "Semantic Error: " << message << RESET << std::endl;
     exit(1);
 }
 void SemanticAnalyzer::checkType(ASTNode* node, Type expectedType, const std::string& errorMessage)
@@ -78,7 +88,8 @@ Type SemanticAnalyzer::inferBinaryOperationType(BinaryOperator op, Type leftType
             error("Type mismatch in binary operation. Expected both types to be int");
             return Type::TYPE_UNDEFINED;
         }
-    } else if ( op == BinaryOperator::EQ || op == BinaryOperator::NEQ 
+    } 
+    else if ( op == BinaryOperator::EQ || op == BinaryOperator::NEQ 
                 || op == BinaryOperator::LT || op == BinaryOperator::GT 
                 || op == BinaryOperator::LTE || op == BinaryOperator::GTE)
     {
@@ -103,22 +114,24 @@ Type SemanticAnalyzer::getFunctionReturnType(const std::string& name)
 
 FunctionDefNode* SemanticAnalyzer::getFunctionDefinition(const std::string& name)
 {
-    if (functions.find(name) != functions.end()) {
+    if (functions.find(name) != functions.end())
+    {
         return functions[name];
     }
     return nullptr;
 }
 
-// Public Visit member functions
 void SemanticAnalyzer::visit(ProgramNode& node)
 {
-    // For Debugging info 
+    // For Debugging info
+#ifdef DEBUG
     std::cerr << "Visiting ProgramNode" << std::endl;
     for (const auto& funcPair : functions)
     {
         std::cerr << "Function found: " << funcPair.first << " : " << funcPair.second << std::endl;
     }
     // End Debugging info
+#endif
 
     std::set<ASTNode*> visitedSubprograms;
     for (const auto& subprogram : node.subprograms)
@@ -141,7 +154,6 @@ void SemanticAnalyzer::visit(BlockNode& node)
     exitScope();
 }
 
-
 void SemanticAnalyzer::visit(FunctionDefNode& node)
 {
      if (functions.find(node.name) != functions.end())
@@ -151,11 +163,13 @@ void SemanticAnalyzer::visit(FunctionDefNode& node)
      }
 
     functions[node.name] = &node;
-    
+
     // For Debugging info 
+#ifdef DEBUG   
     std::cerr << "Visiting FunctionDefNode: " << node.name << ", current scope: " << currentScope << std::endl;
     // End Debugging info
-    
+#endif
+
     currentFunction = &node;
 
     enterScope();
@@ -172,9 +186,11 @@ void SemanticAnalyzer::visit(FunctionDefNode& node)
 void SemanticAnalyzer::visit(LetStatementNode& node)
 {
     // For Debugging info
+#ifdef DEBUG
     std::cerr << "Visiting LetStatementNode: " << node.varName << ", current scope: " << currentScope << std::endl;
     // End Debugging info
-    
+#endif
+
     if(node.initExpr)
         checkType(node.initExpr.get(), node.varType, "Type mismatch in variable initialization for " + node.varName + ".");
    currentScope->addSymbol(node.varName, node.varType);
@@ -183,9 +199,11 @@ void SemanticAnalyzer::visit(LetStatementNode& node)
 void SemanticAnalyzer::visit(AssignStatementNode& node)
 {
     // For Debugging info
+#ifdef DEBUG
     std::cerr << "Visiting AssignStatementNode: " << node.varName << ", current scope: " << currentScope << std::endl;
     // End Debugging info
-    
+#endif
+
     Type varType = currentScope->getSymbolType(node.varName);
     if (varType == Type::TYPE_UNDEFINED)
     {
@@ -197,9 +215,11 @@ void SemanticAnalyzer::visit(AssignStatementNode& node)
 void SemanticAnalyzer::visit(IfStatementNode& node)
 {
     // For Debugging info
+#ifdef DEBUG
     std::cerr << "Visiting IfStatementNode, current scope: " << currentScope << std::endl;
     // End Debugging info
-    
+#endif
+
     checkType(node.condition.get(), Type::TYPE_BOOL, "If condition must be a boolean expression.");
     node.body->accept(*this);
     for(const auto& elif : node.elifClauses)
@@ -211,23 +231,25 @@ void SemanticAnalyzer::visit(IfStatementNode& node)
         node.elseClause->accept(*this);
 }
 
-
 void SemanticAnalyzer::visit(WhileStatementNode& node)
 {
     // For Debugging info
+#ifdef DEBUG
     std::cerr << "Visiting WhileStatementNode, current scope: " << currentScope << std::endl;
     // End Debugging info
-    
+#endif
+
     checkType(node.condition.get(), Type::TYPE_BOOL, "While condition must be a boolean expression.");
     node.body->accept(*this);
 }
 
-
 void SemanticAnalyzer::visit(ReturnStatementNode& node)
 {
     // For Debugging info
+#ifdef DEBUG
     std::cerr << "Visiting ReturnStatementNode, current scope: " << currentScope << std::endl;
     // End Debugging info
+#endif
 
     if (currentFunction == nullptr)
     {
@@ -241,9 +263,11 @@ void SemanticAnalyzer::visit(ReturnStatementNode& node)
 void SemanticAnalyzer::visit(BinaryExpressionNode& node)
 {
     // For Debugging info
+#ifdef DEBUG
     std::cerr << "Visiting BinaryExpressionNode, current scope: " << currentScope << std::endl;
     // End Debugging info
-    
+#endif
+
     checkExpressionType(&node);
     node.left->accept(*this);
     node.right->accept(*this);
@@ -252,9 +276,11 @@ void SemanticAnalyzer::visit(BinaryExpressionNode& node)
 void SemanticAnalyzer::visit(FunctionCallNode& node)
 {
     // For Debugging info
+#ifdef DEBUG
     std::cerr << "Visiting FunctionCallNode: " << node.name << ", current scope: " << currentScope << std::endl;
     // End Debugging info
-    
+#endif
+
     FunctionDefNode* func = getFunctionDefinition(node.name);
     if (!func)
         error("Call to undeclared function " + node.name);
@@ -273,17 +299,20 @@ void SemanticAnalyzer::visit(FunctionCallNode& node)
 void SemanticAnalyzer::visit(NumberNode& node)
 {
     // For Debugging info
+#ifdef DEBUG
     std::cerr << "Visiting NumberNode: " << node.value << ", current scope: " << currentScope << std::endl;
     // End Debugging info
+#endif
 }
-
 
 void SemanticAnalyzer::visit(IdentifierNode& node)
 {
     // For Debugging info
+#ifdef DEBUG
     std::cerr << "Visiting IdentifierNode: " << node.name << ", current scope: " << currentScope << std::endl;
     // End Debugging info
-    
+#endif
+
     if (currentScope->getSymbolType(node.name) == Type::TYPE_UNDEFINED && getFunctionDefinition(node.name) == nullptr)
     {
         error("Undeclared identifier: " + node.name);

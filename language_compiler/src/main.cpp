@@ -2,6 +2,8 @@
 #include <fstream>
 #include <memory>
 #include <string>
+
+#include "macros.hpp"
 #include "ast.hpp"
 #include "semantic.hpp"
 #include "codegen.hpp"
@@ -10,24 +12,24 @@ extern FILE *yyin;
 extern int yyparse();
 extern ASTNode* parse_res;
 
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
     if (argc != 3)
     {
-        std::cerr << "Usage: " << argv[0] << " <input_file>" << " <output_file>"<< std::endl;
+        std::cerr << BLUE << "Usage: " << CYAN << argv[0] << " <input_file>" << " <output_file>" << RESET << std::endl;
         return 1;
     }
 
     yyin = fopen(argv[1], "r");
     if (!yyin)
     {
-        std::cerr << "Error: Could not open input file: " << argv[1] << std::endl;
+        std::cerr << RED << "Error: Could not open input file: " << argv[1] << RESET << std::endl;
         return 1;
     }
 
     if (yyparse() != 0)
     {
-        std::cerr << "Parsing failed." << std::endl;
+        std::cerr << RED <<  "Parsing failed." << RESET << std::endl;
         return 1;
     }
 
@@ -35,14 +37,14 @@ int main(int argc, char **argv)
     {
         std::unique_ptr<ProgramNode> program(dynamic_cast<ProgramNode*>(parse_res));
         semanticAnalyzer.analyze(program.get());
-        CodeGenerator codeGenerator("output.stack");
+        CodeGenerator codeGenerator(std::string(argv[2]) + ".st");
         codeGenerator.generateCode(program.get());
 
-        std::cout << "Compilation successful. Output written to output.stack" << std::endl;
+        std::cout << GREEN <<"Compilation successful. Output written to " << YELLOW << argv[2] << ".st" << RESET << std::endl;
     }
     else
     {
-        std::cerr << "Program is not valid AST node" << std::endl;
+        std::cerr << RED << "Program is not valid!" << RESET << std::endl;
         fclose(yyin);
         exit(EXIT_FAILURE);
     }

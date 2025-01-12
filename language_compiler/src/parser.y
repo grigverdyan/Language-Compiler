@@ -97,18 +97,18 @@ Assignment:
 Conditional_Statement:
     IF LPAREN Expression RPAREN Body { $$ = new IfStatementNode($<node>3, $<node>5); }
     | IF LPAREN Expression RPAREN Body Conditional_Statement_Rest {
-         IfStatementNode* ifNode = new IfStatementNode($<node>3, $<node>5);
-         ifNode->elifClauses = dynamic_cast<IfStatementNode*>($<node>6)->elifClauses;
-         ifNode->elseClause = dynamic_cast<IfStatementNode*>($<node>6)->elseClause;
+        IfStatementNode* ifNode = new IfStatementNode($<node>3, $<node>5);
+        ifNode->elifClauses = dynamic_cast<IfStatementNode*>($<node>6)->elifClauses;
+        ifNode->elseClause = dynamic_cast<IfStatementNode*>($<node>6)->elseClause;
         $$ = ifNode;
     }
 
 Conditional_Statement_Rest:
     ELIF LPAREN Expression RPAREN Body Conditional_Statement_Rest {
-         IfStatementNode* ifNode = new IfStatementNode($<node>3, $<node>5);
-         ifNode->elifClauses = dynamic_cast<IfStatementNode*>($<node>6)->elifClauses;
+        IfStatementNode* ifNode = new IfStatementNode($<node>3, $<node>5);
+        ifNode->elifClauses = dynamic_cast<IfStatementNode*>($<node>6)->elifClauses;
         ifNode->elseClause = dynamic_cast<IfStatementNode*>($<node>6)->elseClause;
-         $$ = ifNode;
+        $$ = ifNode;
         }
   | ELIF LPAREN Expression RPAREN Body {
       $$ = new IfStatementNode($<node>3, $<node>5);
