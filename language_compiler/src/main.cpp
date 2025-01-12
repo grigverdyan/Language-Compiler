@@ -8,7 +8,7 @@
 
 extern FILE *yyin;
 extern int yyparse();
-std::shared_ptr<ProgramNode> program;
+extern ASTNode* parse_res;
 
 int main(int argc, char **argv)
 {
@@ -31,11 +31,21 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    semanticAnalyzer.analyze(program.get());
-    CodeGenerator codeGenerator(std::string(argv[2]) + ".st");
-    codeGenerator.generateCode(program.get());
+    if (dynamic_cast<ProgramNode*>(parse_res))
+    {
+        std::unique_ptr<ProgramNode> program(dynamic_cast<ProgramNode*>(parse_res));
+        semanticAnalyzer.analyze(program.get());
+        CodeGenerator codeGenerator("output.stack");
+        codeGenerator.generateCode(program.get());
 
-    std::cout << "Compilation successful. Output written to output.stack" << std::endl;
+        std::cout << "Compilation successful. Output written to output.stack" << std::endl;
+    }
+    else
+    {
+        std::cerr << "Program is not valid AST node" << std::endl;
+        fclose(yyin);
+        exit(EXIT_FAILURE);
+    }
     
     fclose(yyin);
 

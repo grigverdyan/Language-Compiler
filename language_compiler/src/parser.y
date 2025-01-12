@@ -13,7 +13,7 @@ extern FILE *yyin;
 void yyerror(const char *s);
 
 // Forward declaration of global variables
-extern std::shared_ptr<ProgramNode> program;
+ASTNode* parse_res;
 extern SymbolTable globalSymbolTable;
 extern CodeGenerator codeGenerator;
 
@@ -49,9 +49,10 @@ Type tokenToType(int token);
 
 %%
 Program:
-    Subprogram { program = std::make_unique<ProgramNode>($<node>1); $$ = program.get();program->subprograms.push_back(std::unique_ptr<ASTNode>($<node>1)); }
-    | Program Subprogram  { program->subprograms.push_back(std::unique_ptr<ASTNode>($<node>2)); }
+    Subprogram { parse_res = new ProgramNode($1); $$ = parse_res; }
+    | Program Subprogram  { dynamic_cast<ProgramNode*>($1)->subprograms.push_back(std::unique_ptr<ASTNode>($2)); $$ = $1; }
     ;
+
 
 Subprogram:
     DEF Identifier Parameter_List COLON Type Body { $$ = new FunctionDefNode(*$<id>2, *$<paramList>3, $<type>5, $<node>6); delete $<id>2; delete $<paramList>3; }
@@ -60,7 +61,7 @@ Subprogram:
 Parameter_List:
     LPAREN RPAREN { $$ = new std::vector<std::pair<std::string, Type>>(); }
     | LPAREN Identifier COLON Type { $$ = new std::vector<std::pair<std::string, Type>>(); $$->push_back({*$<id>2, $<type>4}); delete $<id>2; }
-     | LPAREN Identifier COLON Type COMMA ParamList {  $$ = new std::vector<std::pair<std::string, Type>>(); $$->push_back({*$<id>2, $<type>4}); $$->insert($$->end(), $<paramList>6->begin(), $<paramList>6->end()); delete $<id>2; delete $<paramList>6; }
+    | LPAREN Identifier COLON Type COMMA ParamList {  $$ = new std::vector<std::pair<std::string, Type>>(); $$->push_back({*$<id>2, $<type>4}); $$->insert($$->end(), $<paramList>6->begin(), $<paramList>6->end()); delete $<id>2; delete $<paramList>6; }
     | LPAREN  Identifier COLON Type RPAREN { $$ = new std::vector<std::pair<std::string, Type>>(); $$->push_back({*$<id>2,$<type>4}); delete $<id>2; }
     | LPAREN Identifier COLON Type COMMA ParamList RPAREN { $$ = new std::vector<std::pair<std::string, Type>>(); $$->push_back({*$<id>2, $<type>4}); $$->insert($$->end(), $<paramList>6->begin(), $<paramList>6->end()); delete $<id>2; delete $<paramList>6; }
     ;
