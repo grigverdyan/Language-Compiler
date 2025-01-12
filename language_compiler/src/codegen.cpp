@@ -31,17 +31,22 @@ void CodeGenerator::visit(FunctionDefNode& node)
 
 void CodeGenerator::visit(LetStatementNode& node)
 {
-    if(node.initExpr)
+    if (node.initExpr)
     {
         node.initExpr->accept(*this);
     }
-    outputFile << "set " << node.varName << std::endl;
+    else
+    {
+        outputFile << "push 0" << std::endl; // Default to 0
+    }
+
+    outputFile << "pop " << node.varName << std::endl;
 }
 
 void CodeGenerator::visit(AssignStatementNode& node)
 {
     node.expression->accept(*this);
-    outputFile << "set " << node.varName << std::endl;
+    outputFile << "pop " << node.varName << std::endl;
 }
 
 void CodeGenerator::visit(IfStatementNode& node)
