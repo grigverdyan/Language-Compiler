@@ -10,7 +10,7 @@ TaTev Language Specification in EBNF
 Program           = Subprogram { Subprogram }
 Subprogram        = _def_ Identifier Parameter_List Body
 
-Parameter_List     = '(' [ Identifier ':' Type { ',' Identifier ':' Type } ]
+Parameter_List     = '(' [ Identifier ':' Type { ',' Identifier ':' Type } ] ')'
 Body              = { '{' Statement '}' }
 
 Statement         = Variable_Declaration | Assignment | Conditional_Statement | Loop_While_Statement |         
@@ -18,7 +18,7 @@ Statement         = Variable_Declaration | Assignment | Conditional_Statement | 
 
 Variable_Declaration    = _let_ Identifier ':' Type [ '=' Expression ] ';'
 Assignment              = Identifier '=' Expression ';'
-Conditional_Statement   = _if_ '(' Expression ')' Body { _elif_ '(' Expression ')' Body } [ _else_ Body }
+Conditional_Statement   = _if_ '(' Expression ')' Body { _elif_ '(' Expression ')' Body } [ _else_ Body ]
 Loop_While_Statement    = _while_ '(' Expression ')' Body
 Return_Statement        = _return_ Identifier | Expression ';'
 
